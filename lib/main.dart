@@ -67,7 +67,7 @@ class _RootState extends State<Root> {
         if (snapshot.connectionState == ConnectionState.active) {
           if (snapshot.data?.uid == null) {
             return LoginScreen(
-              auth: _auth,
+              auth: _auth,    
               firestore: _firestore,
             );
           } else {

@@ -1,18 +1,19 @@
-import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:flutter/material.dart';
 import 'package:faker/faker.dart';
+import 'package:notetastic/services/database_handler.dart';
 
 import '../models/note.dart';
 import '../widgets/note_grid.dart';
 
 class HomeScreen extends StatefulWidget {
+  final dbHandler = DatabaseHandler();
+
   @override
   _HomeScreenState createState() => _HomeScreenState();
 }
 
 class _HomeScreenState extends State<HomeScreen> {
   List<Note> noteData = [];
-  bool isLoading = false;
 
   void _addNote() {
     const faker = Faker();
@@ -34,12 +35,25 @@ class _HomeScreenState extends State<HomeScreen> {
   @override
   Widget build(BuildContext context) {
     return Scaffold(
-      body: isLoading
-          ? const Center(child: CircularProgressIndicator())
-          : NoteGrid(
-              noteData: noteData,
-              deleteNote: _deleteNote,
-            ),
+      body: StreamBuilder<Object>(
+          stream: widget.dbHandler.getNoteStream(),
+          builder: (context, snapshot) {
+            if (snapshot.hasError) {
+              // ignore: avoid_print
+              print("Error occurred: ${snapshot.error.toString()}");
+              return const Center(child: Text("Error"));
+            }
+            if (snapshot.connectionState == ConnectionState.done) {
+							for (final data in snapshot.data as Iterable<Note>) {
+								noteData.add(data);
+							}
+              return NoteGrid(
+                noteData: noteData,
+                deleteNote: _deleteNote,
+              );
+            }
+            return const Center(child: CircularProgressIndicator());
+          }),
       floatingActionButton: Container(
         width: 75.0,
         height: 75.0,

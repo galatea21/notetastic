@@ -7,9 +7,9 @@ class NoteEditScreen extends StatelessWidget {
       appBar: AppBar(
         title: const Text('Note Screen'),
       ),
-      body: Container(
+      body: const SizedBox(
         height: double.infinity,
-        child: const TextField(
+        child: TextField(
           maxLines: null,
           expands: true,
         ),
